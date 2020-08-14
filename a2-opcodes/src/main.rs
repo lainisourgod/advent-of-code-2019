@@ -15,8 +15,63 @@ fn read_program() -> Program {
     program
 }
 
-fn execute_program(program: Program) -> Program {
+fn execute_program(mut program: Program) -> Program {
+    let mut result: usize;
+    let mut index: usize = 0;
+    loop {
+        if index > program.len() - 4 {
+            break;
+        }
+        let code_block: Vec<usize>;
+        {
+            code_block = Vec::from(&program[index..index + 4]);
+            match code_block[0] {
+                1 => {
+                    result = program[code_block[1]] + program[code_block[2]];
+                }
+                2 => {
+                    result = program[code_block[1]] * program[code_block[2]];
+                }
+                99 => break,
+                _ => panic!("Incorrect first code at block {:?}", code_block),
+            }
+        }
+        program[code_block[3]] = result;
+        index += 4;
+    }
+
     program
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn it_works() {
+        let cases = [
+            (
+                Program::from([1, 0, 0, 0, 99]),
+                Program::from([2, 0, 0, 0, 99]),
+            ),
+            (
+                Program::from([2, 3, 0, 3, 99]),
+                Program::from([2, 3, 0, 6, 99]),
+            ),
+            (
+                Program::from([2, 4, 4, 5, 99, 0]),
+                Program::from([2, 4, 4, 5, 99, 9801]),
+            ),
+            (
+                Program::from([1, 1, 1, 4, 99, 5, 6, 0, 99]),
+                Program::from([30, 1, 1, 4, 2, 5, 6, 0, 99]),
+            ),
+        ];
+
+        for case in &cases {
+            assert_eq!(execute_program(case.0.clone()), case.1)
+        }
+    }
 }
 
 fn main() {
@@ -24,5 +79,6 @@ fn main() {
     println!("The program: {:?}", program);
 
     let new_program = execute_program(program);
+    println!("\nNew program: {:?}", new_program);
     println!("First value: {:?}", new_program.get(0));
 }
