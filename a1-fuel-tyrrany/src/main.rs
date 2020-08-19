@@ -21,12 +21,24 @@ fn read_masses() -> io::Result<Vec<i32>> {
     Ok(masses)
 }
 
-fn fuel_for_module(module_mass: i32) -> i32 {
-    module_mass / 3 - 2
+fn fuel_for_module(mass: i32) -> i32 {
+    mass / 3 - 2
+}
+
+fn fuel_for_fuels(mass: i32) -> i32 {
+    let fuel = mass / 3 - 2;
+    if fuel > 0 {
+        fuel + fuel_for_fuels(fuel)
+    } else {
+        0
+    }
 }
 
 fn main() {
     let masses = read_masses().unwrap();
-    let total_fuel_required: i32 = masses.iter().map(|mass| fuel_for_module(*mass)).sum();
-    println!("Total fule: {:?}", total_fuel_required);
+    let fuel_for_modules: i32 = masses.iter().map(|mass| fuel_for_module(*mass)).sum();
+    println!("Fuel for models: {:?}", fuel_for_modules);
+
+    let fuel_for_fuel: i32 = masses.iter().map(|mass| fuel_for_fuels(*mass)).sum();
+    println!("Fuel TOTAL: {:?}", fuel_for_fuel);
 }
