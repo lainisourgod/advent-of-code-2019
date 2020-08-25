@@ -3,6 +3,15 @@ use std::fs;
 
 type Program = Vec<usize>;
 
+fn main() {
+    let program: Program = read_program();
+    println!("The program: {:?}", program);
+
+    let new_program = execute_program(program);
+    println!("\nNew program: {:?}", new_program);
+    println!("First value: {:?}", new_program.get(0));
+}
+
 fn read_program() -> Program {
     let program_text = fs::read_to_string("program.txt").unwrap();
     let program_regex = Regex::new(r"(\d+)").unwrap();
@@ -43,42 +52,28 @@ fn execute_program(mut program: Program) -> Program {
     program
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
+#[test]
+fn test_program_execution() {
+    let cases = [
+        (
+            Program::from([1, 0, 0, 0, 99]),
+            Program::from([2, 0, 0, 0, 99]),
+        ),
+        (
+            Program::from([2, 3, 0, 3, 99]),
+            Program::from([2, 3, 0, 6, 99]),
+        ),
+        (
+            Program::from([2, 4, 4, 5, 99, 0]),
+            Program::from([2, 4, 4, 5, 99, 9801]),
+        ),
+        (
+            Program::from([1, 1, 1, 4, 99, 5, 6, 0, 99]),
+            Program::from([30, 1, 1, 4, 2, 5, 6, 0, 99]),
+        ),
+    ];
 
-    #[test]
-    fn it_works() {
-        let cases = [
-            (
-                Program::from([1, 0, 0, 0, 99]),
-                Program::from([2, 0, 0, 0, 99]),
-            ),
-            (
-                Program::from([2, 3, 0, 3, 99]),
-                Program::from([2, 3, 0, 6, 99]),
-            ),
-            (
-                Program::from([2, 4, 4, 5, 99, 0]),
-                Program::from([2, 4, 4, 5, 99, 9801]),
-            ),
-            (
-                Program::from([1, 1, 1, 4, 99, 5, 6, 0, 99]),
-                Program::from([30, 1, 1, 4, 2, 5, 6, 0, 99]),
-            ),
-        ];
-
-        for case in &cases {
-            assert_eq!(execute_program(case.0.clone()), case.1)
-        }
+    for case in &cases {
+        assert_eq!(execute_program(case.0.clone()), case.1)
     }
-}
-
-fn main() {
-    let program: Program = read_program();
-    println!("The program: {:?}", program);
-
-    let new_program = execute_program(program);
-    println!("\nNew program: {:?}", new_program);
-    println!("First value: {:?}", new_program.get(0));
 }
