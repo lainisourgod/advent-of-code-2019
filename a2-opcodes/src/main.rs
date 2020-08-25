@@ -5,10 +5,13 @@ mod computer;
 use computer::Computer;
 
 fn main() {
-    let program: Vec<usize> = read_program();
-    println!("The program: {:?}", program);
-
     let mut computer = Computer::new();
+
+    let mut program: Vec<usize> = read_program();
+
+    // First star challenge
+    program[1] = 12;
+    program[2] = 2;
 
     computer.set_program(&program);
     computer.execute_program();
