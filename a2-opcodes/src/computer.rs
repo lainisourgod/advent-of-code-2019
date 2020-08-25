@@ -42,19 +42,23 @@ impl Computer {
         }
     }
 
+    /// Clean up internal state.
     pub fn reset(&mut self) {
         *self = Computer::new();
     }
 
+    /// Load new program to a memory.
     pub fn set_program(&mut self, program: &[usize]) {
         self.memory = Vec::from(program);
         self.pointer = 0;
     }
 
+    /// Get value located in memory at a given address.
     pub fn get_value_at_address(&self, address: usize) -> usize {
         self.memory[address]
     }
 
+    /// Step through the program and execute every instruction until Halt.
     pub fn execute_program(&mut self) {
         loop {
             if self.pointer > self.memory.len() - 4 {
