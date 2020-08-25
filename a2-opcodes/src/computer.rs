@@ -74,11 +74,11 @@ impl Computer {
         match instruction {
             Halt => self.pointer = self.memory.len(),
             Add { a, b, to } => {
-                self.memory[*to] = a + b;
+                self.memory[*to] = self.memory[*a] + self.memory[*b];
                 self.pointer += 4;
             }
             Mul { a, b, to } => {
-                self.memory[*to] = a * b;
+                self.memory[*to] = self.memory[*a] * self.memory[*b];
                 self.pointer += 4;
             }
         }
