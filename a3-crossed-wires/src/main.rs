@@ -231,3 +231,36 @@ fn test_wire_parsing() {
         ]
     )
 }
+
+#[test]
+fn test_wire_crossing_distance() {
+    let cases = vec![
+        (
+            parse_wires(
+                "R75,D30,R83,U83,L12,D49,R71,U7,L72\nU62,R66,U55,R34,D71,R55,D58,R83".to_owned(),
+            ),
+            159,
+        ),
+        (
+            parse_wires(
+                "R98,U47,R26,D63,R33,U87,L62,D20,R33,U53,R51\nU98,R91,D20,R16,D67,R40,U7,R15,U6,R7"
+                    .to_owned(),
+            ),
+            135,
+        ),
+    ];
+
+    for case in cases {
+        let wires = case.0;
+        let distance = case.1;
+        print_wires(&wires);
+        let intersection = find_closest_intersection(&wires[0], &wires[1]);
+        assert_eq!(intersection.unwrap().distance_from_origin(), distance);
+    }
+}
+
+fn print_wires(wires: &Vec<Vec<Point>>) {
+    for (p1, p2) in wires[0].iter().zip(wires[1].iter()) {
+        println!("{:5?}       {:5?}", p1, p2);
+    }
+}
