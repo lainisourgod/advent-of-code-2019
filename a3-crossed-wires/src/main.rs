@@ -217,17 +217,17 @@ fn test_wire_parsing() {
     assert_eq!(
         parse_wires(text),
         [
-            Vec::from([
+            vec![
                 Point { x: 992, y: 0 },
                 Point { x: 992, y: 221 },
                 Point { x: 170, y: 221 },
                 Point { x: 170, y: 1026 }
-            ]),
-            Vec::from([
+            ],
+            vec![
                 Point { x: -998, y: 0 },
                 Point { x: -998, y: 308 },
                 Point { x: -109, y: 308 }
-            ])
+            ]
         ]
     )
 }
