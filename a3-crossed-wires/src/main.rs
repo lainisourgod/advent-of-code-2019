@@ -97,15 +97,18 @@ struct Point {
     y: i32,
 }
 
+impl Point {
+    fn distance_from_origin(&self) -> u32 {
+        (self.x.abs() + self.y.abs()) as u32
+    }
+}
+
 impl Ord for Point {
     /// Compare Points by Manhattan distance between a point and an origin (Point {x: 0, y: 0}).
     /// Manhattan distance is sum of absolute values of every coordinate of the Point.
     fn cmp(&self, other: &Self) -> Ordering {
-        // (self.x.abs() + self.y.abs()).cmp(&(other.x.abs() + other.y.abs()))
-        let a = self.x.abs() + self.y.abs();
-        let b = other.x.abs() + other.y.abs();
-        println!("CMP: a = {} b = {}", a, b);
-        a.cmp(&b)
+        self.distance_from_origin()
+            .cmp(&other.distance_from_origin())
     }
 }
 
