@@ -6,14 +6,7 @@ use std::ops::Add;
 fn main() {
     let text = fs::read_to_string("input.txt").unwrap();
     let wires = parse_wires(text);
-    for wire in &wires {
-        for point in wire {
-            println!("{:?}", point);
-        }
-    }
-    let a = &wires[0][0];
-    let b = &wires[0][1];
-    println!("a {:?} b {:?} a > b {}", a, b, a > b);
+    print_wires(&wires);
     println!(
         "Closes intersection: {:?}",
         find_closest_intersection(&wires[0], &wires[1])
@@ -37,19 +30,38 @@ fn parse_wires(text: String) -> Vec<Wire> {
     let origin = Point { x: 0, y: 0 };
 
     // Calculate every point of each wire
-    let wires: Vec<Wire> = moves_of_wires
+    let mut wires: Vec<Wire> = moves_of_wires
         .iter()
         .map(|wire_moves| {
-            let mut current = origin.clone();
+            // Every wire starts at origin
+            let mut current = origin;
+            let mut before = origin;
+
             wire_moves
                 .iter()
                 .map(|&move_| {
+                    let mut points = vec![];
+                    // Calculate the end of a segment
+                    before = current;
                     current = current + move_;
-                    current
+
+                    // Store points of this segment
+                    points.extend(all_points_between(before, current));
+                    points.push(current);
+
+                    // Return all points of this siegment
+                    points
                 })
+                // Collect points of segments in a flat vector of all points of a wire
+                .flatten()
                 .collect()
         })
         .collect();
+
+    // Add origin to all of the wires
+    for wire in &mut wires {
+        wire.insert(0, origin);
+    }
 
     wires
 }
