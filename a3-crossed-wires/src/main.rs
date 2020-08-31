@@ -6,7 +6,6 @@ use std::ops::Add;
 fn main() {
     let text = fs::read_to_string("input.txt").unwrap();
     let wires = parse_wires(text);
-    print_wires(&wires);
     println!(
         "Closes intersection: {:?}",
         find_closest_intersection(&wires[0], &wires[1])
