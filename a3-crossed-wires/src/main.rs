@@ -216,20 +216,31 @@ fn test_point_ordering() {
 
 #[test]
 fn test_wire_parsing() {
-    let text = "R992,U221,L822,U805\nL998,U308,R889".to_owned();
+    let text = "R2,U2,L3,D1\nL1,U2,R3".to_owned();
+    let wires = parse_wires(text);
+    print_wires(&wires);
     assert_eq!(
-        parse_wires(text),
+        wires,
         [
             vec![
-                Point { x: 992, y: 0 },
-                Point { x: 992, y: 221 },
-                Point { x: 170, y: 221 },
-                Point { x: 170, y: 1026 }
+                Point { x: 0, y: 0 },
+                Point { x: 1, y: 0 },
+                Point { x: 2, y: 0 },
+                Point { x: 2, y: 1 },
+                Point { x: 2, y: 2 },
+                Point { x: 1, y: 2 },
+                Point { x: 0, y: 2 },
+                Point { x: -1, y: 2 },
+                Point { x: -1, y: 1 },
             ],
             vec![
-                Point { x: -998, y: 0 },
-                Point { x: -998, y: 308 },
-                Point { x: -109, y: 308 }
+                Point { x: 0, y: 0 },
+                Point { x: -1, y: 0 },
+                Point { x: -1, y: 1 },
+                Point { x: -1, y: 2 },
+                Point { x: 0, y: 2 },
+                Point { x: 1, y: 2 },
+                Point { x: 2, y: 2 },
             ]
         ]
     )
@@ -238,6 +249,13 @@ fn test_wire_parsing() {
 #[test]
 fn test_wire_crossing_distance() {
     let cases = vec![
+        (
+            vec![
+                vec![Point { x: 0, y: 5 }, Point { x: 0, y: 6 }],
+                vec![Point { x: 0, y: 6 }, Point { x: 1, y: 6 }],
+            ],
+            6,
+        ),
         (
             parse_wires(
                 "R75,D30,R83,U83,L12,D49,R71,U7,L72\nU62,R66,U55,R34,D71,R55,D58,R83".to_owned(),
@@ -260,9 +278,56 @@ fn test_wire_crossing_distance() {
         let intersection = find_closest_intersection(&wires[0], &wires[1]);
         assert_eq!(intersection.unwrap().distance_from_origin(), distance);
     }
+
+    assert_eq!(
+        find_closest_intersection(
+            &[Point { x: 0, y: 0 }, Point { x: 0, y: 1 }],
+            &[Point { x: 1, y: 2 }, Point { x: 2, y: 2 }]
+        ),
+        None
+    );
 }
 
-fn print_wires(wires: &Vec<Vec<Point>>) {
+#[test]
+fn test_all_points_between() {
+    let cases = vec![
+        ((Point { x: 0, y: 0 }, Point { x: 1, y: 0 }), vec![]),
+        (
+            (Point { x: 0, y: 0 }, Point { x: 2, y: 0 }),
+            vec![Point { x: 1, y: 0 }],
+        ),
+        (
+            (Point { x: -1, y: 0 }, Point { x: 1, y: 0 }),
+            vec![Point { x: 0, y: 0 }],
+        ),
+        ((Point { x: -1, y: 0 }, Point { x: -2, y: 0 }), vec![]),
+        (
+            (Point { x: -1, y: 0 }, Point { x: -3, y: 0 }),
+            vec![Point { x: -2, y: 0 }],
+        ),
+        ((Point { x: 1, y: 1 }, Point { x: 1, y: 1 }), vec![]),
+        (
+            (Point { x: 5, y: 6 }, Point { x: 5, y: 10 }),
+            vec![
+                Point { x: 5, y: 7 },
+                Point { x: 5, y: 8 },
+                Point { x: 5, y: 9 },
+            ],
+        ),
+    ];
+
+    for case in cases {
+        assert_eq!(all_points_between(case.0.0, case.0.1), case.1, "\nfailed case {:?}", case);
+    }
+}
+
+#[test]
+#[should_panic]
+fn test_all_points_between_panics_when_points_are_not_on_the_same_axis() {
+    all_points_between(Point { x: 0, y: 1 }, Point { x: 1, y: 2 });
+}
+
+fn print_wires(wires: &[Vec<Point>]) {
     for (p1, p2) in wires[0].iter().zip(wires[1].iter()) {
         println!("{:5?}       {:5?}", p1, p2);
     }
