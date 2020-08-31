@@ -198,14 +198,24 @@ impl Add<Move> for Point {
     }
 }
 
-/// Find intersection in integer space
-fn find_closest_intersection(left: &[Point], right: &[Point]) -> Option<Point> {
+/// Find intersections of wires. Intersection is guaranteed to be included as a Point in a wire
+/// vec as all lines are aligned along axis and all moves' distances are integer.
+fn find_intersections(left: &[Point], right: &[Point]) -> HashSet<Point> {
     let left_set: HashSet<Point> = left.iter().cloned().collect();
     let right_set: HashSet<Point> = right.iter().cloned().collect();
-    let mut intersection = left_set.intersection(&right_set).collect::<HashSet<_>>();
-    intersection.remove(&Point { x: 0, y: 0 });
-    intersection.iter().min().cloned().cloned()
+    let mut intersections = left_set
+        .intersection(&right_set)
+        .cloned()
+        .collect::<HashSet<_>>();
+    intersections.remove(&Point { x: 0, y: 0 });
+    intersections
 }
+
+/// Find closest to origin intersection of two wires.
+fn find_closest_intersection(left: &[Point], right: &[Point]) -> Option<Point> {
+    find_intersections(left, right).iter().min().cloned()
+}
+
 
 #[test]
 fn test_find_closest_intersection() {
