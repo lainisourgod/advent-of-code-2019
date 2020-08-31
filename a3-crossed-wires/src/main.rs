@@ -24,11 +24,11 @@ fn parse_wires(text: String) -> Vec<Wire> {
     // Read moves
     let moves_of_wires: Vec<Vec<Move>> = text
         .trim()
-        .split("\n") // First split -- on two wires
+        .split('\n') // First split -- on two wires
         .map(|wire_text| {
             wire_text
                 .trim()
-                .split(",")
+                .split(',')
                 .map(|string| string.into())
                 .collect()
         })
@@ -125,7 +125,7 @@ struct Move {
 impl From<&str> for Move {
     fn from(string: &str) -> Self {
         Move {
-            direction: string.chars().nth(0).unwrap().into(),
+            direction: string.chars().next().unwrap().into(),
             distance: string.get(1..).unwrap().parse().unwrap(),
         }
     }
@@ -163,6 +163,7 @@ impl PartialOrd for Point {
 impl Add<Move> for Point {
     type Output = Self;
 
+    #[allow(clippy::suspicious_arithmetic_impl)]
     fn add(self, move_: Move) -> Self::Output {
         match move_.direction {
             Direction::Left => Point {
@@ -185,10 +186,13 @@ impl Add<Move> for Point {
     }
 }
 
+/// Find intersection in integer space
 fn find_closest_intersection(left: &[Point], right: &[Point]) -> Option<Point> {
-    let left_set: HashSet<Point> = left.into_iter().cloned().collect();
-    let right_set: HashSet<Point> = right.into_iter().cloned().collect();
-    left_set.intersection(&right_set).min().cloned()
+    let left_set: HashSet<Point> = left.iter().cloned().collect();
+    let right_set: HashSet<Point> = right.iter().cloned().collect();
+    let mut intersection = left_set.intersection(&right_set).collect::<HashSet<_>>();
+    intersection.remove(&Point { x: 0, y: 0 });
+    intersection.iter().min().cloned().cloned()
 }
 
 #[test]
