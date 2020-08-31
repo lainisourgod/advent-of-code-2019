@@ -54,6 +54,48 @@ fn parse_wires(text: String) -> Vec<Wire> {
     wires
 }
 
+fn all_points_between(first: Point, second: Point) -> Vec<Point> {
+    let mut points = Vec::new();
+
+    // Which way to go along x and along y
+    let step = Point {
+        x: match second.x.cmp(&first.x) {
+            Ordering::Greater => 1,
+            Ordering::Equal => 0,
+            Ordering::Less => -1,
+        },
+        y: match second.y.cmp(&first.y) {
+            Ordering::Greater => 1,
+            Ordering::Equal => 0,
+            Ordering::Less => -1,
+        },
+    };
+
+    assert!(
+        step.x == 0 || step.y == 0,
+        "Two points should lie on the same axis: either X or Y coordinates are equal"
+    );
+
+    if (second.x - first.x).abs() == 1 || (second.y - first.y).abs() == 1 {
+        return vec![];
+    }
+
+    let mut current = first;
+
+    loop {
+        current = Point {
+            x: current.x + step.x,
+            y: current.y + step.y,
+        };
+        if current == second {
+            break;
+        }
+        points.push(current);
+    }
+
+    points
+}
+
 #[derive(Debug, Clone, Copy)]
 enum Direction {
     Up,
