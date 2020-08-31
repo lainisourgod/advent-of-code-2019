@@ -7,7 +7,7 @@ fn main() {
     let text = fs::read_to_string("input.txt").unwrap();
     let wires = parse_wires(text);
     println!(
-        "Closes intersection: {:?}",
+        "Closest intersection: {:?}",
         find_closest_intersection(&wires[0], &wires[1])
     )
 }
