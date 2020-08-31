@@ -9,7 +9,12 @@ fn main() {
     println!(
         "Closest intersection: {:?}",
         find_closest_intersection(&wires[0], &wires[1])
-    )
+    );
+
+    println!(
+        "Intersection with minimal steps requires {} steps",
+        find_minimal_step_intersection(&wires[0], &wires[1]).unwrap()
+    );
 }
 
 fn parse_wires(text: String) -> Vec<Wire> {
@@ -215,6 +220,19 @@ fn find_closest_intersection(left: &[Point], right: &[Point]) -> Option<Point> {
     find_intersections(left, right).iter().min().cloned()
 }
 
+/// Find intersection of wires that produces minimal delay. Sum of lengths of wires till this
+/// intersection should be minimal.
+fn find_minimal_step_intersection(left: &[Point], right: &[Point]) -> Option<u32> {
+    find_intersections(left, right)
+        .iter()
+        .map(|&point| length_to_point_in_wire(left, point) + length_to_point_in_wire(right, point))
+        .min()
+}
+
+/// Compute length of a wire segment from origin to this point.
+fn length_to_point_in_wire(wire: &[Point], point: Point) -> u32 {
+    wire.iter().position(|&p| p == point).unwrap() as u32
+}
 
 #[test]
 fn test_find_closest_intersection() {
