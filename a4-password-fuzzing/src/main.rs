@@ -8,34 +8,56 @@ fn main() {
 }
 
 fn password_is_good(password: u32) -> bool {
-    let mut has_two_adjacent_same_digits = false;
+    // Set initial values for our good password flags
     let mut not_decreasing = true;
+    let mut group_sizes: Vec<u32> = Vec::new();
+    let mut group_size = 1;
 
     let digits: Vec<char> = password.to_string().chars().collect();
     for (current, next) in digits.iter().zip(digits.iter().skip(1)) {
-        not_decreasing = not_decreasing
-            && match current.cmp(next) {
-                Less => true,
-                Equal => {
-                    has_two_adjacent_same_digits = true;
-                    true
-                }
-                Greater => false,
-            };
+        // Do not use match as we have common logic for Greater and Less patterns.
+        let ordering = current.cmp(next);
+        if ordering == Equal {
+            group_size += 1;
+        } else {
+            // Store size of previous group
+            group_sizes.push(group_size);
+
+            // Reset the group
+            group_size = 1;
+
+            // Check that digits do not decrease
+            if ordering == Greater {
+                not_decreasing = false;
+            }
+        };
     }
 
-    // println!("{} {}", not_decreasing, has_two_adjacent_same_digits);
+    // Push size of the last group
+    group_sizes.push(group_size);
 
-    not_decreasing && has_two_adjacent_same_digits
+    let has_group_of_only_two_adjacent_same_digits = group_sizes.contains(&2);
+
+    #[cfg(test)]
+    println!(
+        "{} {}",
+        not_decreasing, has_group_of_only_two_adjacent_same_digits
+    );
+
+    not_decreasing && has_group_of_only_two_adjacent_same_digits
 }
 
 #[test]
 fn test_password_is_good() {
     let cases = vec![
-        (111111, true),
+        (112233, true),
+        (111122, true), // has a group of exactly two adjacent digits
         (223457, true),
-        (223450, false),
-        (123789, false),
+        (223450, false), // decrease at the end
+        (123789, false), // no same adjacent digits
+        (121212, false), // same digits are not adjacent
+        (111111, false), // all six digits are same
+        (123444, false), // 3 adjacent -- too much
     ];
 
     for case in cases {
